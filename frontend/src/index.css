@@ -1,0 +1,178 @@
+:root {
+  color-scheme: light dark;
+
+  /* 页面与表面 */
+  --bg-page: #e8edf3;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #f4f7fb;
+  --bg: var(--bg-surface);
+  --code-bg: #eef2f7;
+
+  /* 文本 */
+  --text: #5c6b7f;
+  --text-h: #0c1929;
+  --text-muted: color-mix(in oklab, var(--text) 75%, var(--text-h));
+
+  /* 边框 */
+  --border: color-mix(in oklab, #64748b 16%, white);
+  --border-subtle: color-mix(in oklab, var(--border) 65%, var(--bg-surface));
+
+  /* 品牌强调：偏 Cursor / 工具型蓝 */
+  --accent: #2563eb;
+  --accent-bright: #3b82f6;
+  --accent-muted: color-mix(in oklab, var(--accent) 14%, var(--bg-surface));
+  --accent-bg: var(--accent-muted);
+  --accent-border: color-mix(in oklab, var(--accent) 42%, var(--border));
+  --accent-on: #f4fbfb;
+
+  --success: #0d8668;
+  --success-muted: color-mix(in oklab, var(--success) 14%, var(--bg-surface));
+  --danger: #c4243c;
+  --danger-muted: color-mix(in oklab, var(--danger) 12%, var(--bg-surface));
+
+  --social-bg: var(--bg-surface-2);
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  --sans: var(--font-sans);
+  --heading: var(--font-sans);
+  --mono: var(--font-mono);
+
+  /* 克制 elevation */
+  --elev-1: 0 1px 0 color-mix(in oklab, white 55%, transparent),
+    0 18px 48px -28px color-mix(in oklab, #0c1929 18%, transparent);
+
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--text);
+  background: var(--bg-page);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* 偏 Cursor / 编辑器系：近黑底 + 略抬亮的表面 */
+    --bg-page: #09090a;
+    --bg-surface: #141416;
+    --bg-surface-2: #1b1b1f;
+    --bg: var(--bg-surface);
+    --code-bg: #121214;
+
+    --text: #9ca3af;
+    --text-h: #ececf1;
+    --text-muted: color-mix(in oklab, var(--text) 72%, var(--text-h));
+
+    --border: color-mix(in oklab, white 9%, #09090a);
+    --border-subtle: color-mix(in oklab, var(--border) 50%, #09090a);
+
+    --accent: #3b82f6;
+    --accent-bright: #60a5fa;
+    --accent-muted: color-mix(in oklab, var(--accent) 18%, #141416);
+    --accent-bg: var(--accent-muted);
+    --accent-border: color-mix(in oklab, var(--accent) 35%, var(--border));
+    --accent-on: #f8fafc;
+
+    --success: #4ade80;
+    --success-muted: color-mix(in oklab, var(--success) 14%, #141416);
+    --danger: #f87171;
+    --danger-muted: color-mix(in oklab, var(--danger) 12%, #141416);
+
+    --social-bg: var(--bg-surface-2);
+
+    --elev-1: 0 1px 0 color-mix(in oklab, white 6%, transparent),
+      0 20px 50px -28px rgba(0, 0, 0, 0.55);
+  }
+
+  #social .button-icon {
+    filter: invert(1) brightness(2);
+  }
+}
+
+#root {
+  width: min(1280px, 100%);
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: left;
+  min-height: 100svh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+@media (max-width: 768px) {
+  #root {
+    width: 100%;
+  }
+}
+
+/* 主界面类微信全屏聊天：占满视口宽度 */
+#root:has(.appPage--chatShell) {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-page);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--heading);
+  font-weight: 600;
+  color: var(--text-h);
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  line-height: 1.15;
+  margin: 0.5em 0;
+}
+
+h2 {
+  font-size: clamp(1.15rem, 2.5vw, 1.35rem);
+  line-height: 1.2;
+  margin: 0 0 0.5em;
+}
+
+h3 {
+  font-size: 1rem;
+  margin: 0 0 0.35em;
+}
+
+p {
+  margin: 0;
+}
+
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 6px;
+  color: var(--text-h);
+}
+
+code {
+  font-size: 0.86em;
+  line-height: 1.35;
+  padding: 0.15em 0.45em;
+  background: var(--code-bg);
+  border: 1px solid var(--border-subtle);
+}

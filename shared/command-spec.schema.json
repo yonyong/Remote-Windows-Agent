@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/command-spec.schema.json",
+  "title": "CommandSpec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["command_id", "device_id", "steps", "created_at_ms"],
+  "properties": {
+    "command_id": { "type": "string", "minLength": 8, "maxLength": 128 },
+    "device_id": { "type": "string", "minLength": 8, "maxLength": 128 },
+    "created_at_ms": { "type": "integer", "minimum": 0 },
+    "timeout_ms": { "type": "integer", "minimum": 1000, "maximum": 600000, "default": 120000 },
+    "risk_level": { "type": "string", "enum": ["low", "medium", "high"], "default": "low" },
+    "steps": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 64,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "app"],
+            "properties": {
+              "type": { "const": "open_app" },
+              "app": { "type": "string", "maxLength": 64 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "url"],
+            "properties": {
+              "type": { "const": "open_url" },
+              "url": { "type": "string", "maxLength": 2048 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "text"],
+            "properties": {
+              "type": { "const": "type_text" },
+              "text": { "type": "string", "maxLength": 2048 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "key"],
+            "properties": {
+              "type": { "const": "press_key" },
+              "key": { "type": "string", "maxLength": 32 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "sequence"],
+            "properties": {
+              "type": { "const": "sendkeys" },
+              "sequence": { "type": "string", "maxLength": 256 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "ms"],
+            "properties": {
+              "type": { "const": "sleep" },
+              "ms": { "type": "integer", "minimum": 0, "maximum": 600000 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type"],
+            "properties": {
+              "type": { "const": "screenshot" }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "message"],
+            "properties": {
+              "type": { "const": "notify" },
+              "message": { "type": "string", "maxLength": 2048 }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "action"],
+            "properties": {
+              "type": { "const": "volume" },
+              "action": { "type": "string", "enum": ["up", "down", "mute"] }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type"],
+            "properties": {
+              "type": { "const": "lock_screen" }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "action"],
+            "properties": {
+              "type": { "const": "media" },
+              "action": { "type": "string", "enum": ["play_pause", "next", "prev"] }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type"],
+            "properties": {
+              "type": { "const": "show_desktop" }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

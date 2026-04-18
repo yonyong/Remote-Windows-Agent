@@ -1,0 +1,22 @@
+{
+  "name": "remote-windows-agent",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "nanoid": "^5.1.5",
+    "ws": "^8.18.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/ws": "^8.5.14",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2"
+  }
+}
+

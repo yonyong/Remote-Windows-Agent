@@ -1,0 +1,2869 @@
+/* ========== 设计底层：氛围与层级 ========== */
+.page {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+/* ========== 微信式简化登录 ========== */
+.wxLoginPage {
+  position: relative;
+  isolation: isolate;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px calc(40px + env(safe-area-inset-bottom, 0));
+  box-sizing: border-box;
+  min-height: 100dvh;
+  background: #ededed;
+  text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  .wxLoginPage {
+    background: #111;
+  }
+}
+
+.wxLoginPage::before {
+  display: none;
+}
+
+.wxLoginCard {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+}
+
+.wxLoginMark {
+  align-self: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: #07c160;
+  color: #fff;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.04em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  box-shadow: 0 6px 20px color-mix(in oklab, #07c160 35%, transparent);
+}
+
+.wxLoginTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #191919;
+  letter-spacing: 0.02em;
+}
+
+@media (prefers-color-scheme: dark) {
+  .wxLoginTitle {
+    color: #f5f5f5;
+  }
+}
+
+.wxLoginSub {
+  margin: -8px 0 8px;
+  font-size: 13px;
+  color: #888;
+}
+
+.wxLoginField {
+  display: block;
+  text-align: left;
+}
+
+.wxLoginLabel {
+  display: block;
+  font-size: 13px;
+  color: #576b95;
+  margin-bottom: 6px;
+  padding-left: 2px;
+}
+
+.wxLoginInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  font-size: 16px;
+  line-height: 1.4;
+  border: 1px solid color-mix(in oklab, #000 12%, #ededed);
+  border-radius: 4px;
+  background: #fff;
+  color: #111;
+}
+
+@media (prefers-color-scheme: dark) {
+  .wxLoginInput {
+    background: #1e1e1e;
+    border-color: #333;
+    color: #eee;
+  }
+}
+
+.wxLoginInput:focus {
+  outline: none;
+  border-color: #07c160;
+  box-shadow: 0 0 0 1px color-mix(in oklab, #07c160 45%, transparent);
+}
+
+.wxLoginMore {
+  text-align: left;
+  border: none;
+  margin: 0;
+}
+
+.wxLoginMore > summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 13px;
+  color: #576b95;
+  padding: 4px 2px;
+}
+
+.wxLoginMore > summary::-webkit-details-marker {
+  display: none;
+}
+
+.wxLoginHint {
+  margin: 8px 0 10px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: #888;
+}
+
+.wxLoginHint code {
+  font-size: 11px;
+}
+
+.wxLoginError {
+  font-size: 13px;
+  color: #fa5151;
+  text-align: left;
+  padding: 0 2px;
+}
+
+.wxLoginNotice {
+  font-size: 13px;
+  color: #07c160;
+  text-align: left;
+}
+
+.wxLoginPrimary {
+  width: 100%;
+  margin-top: 4px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 4px;
+  background: #07c160;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+}
+
+.wxLoginPrimary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.wxLoginPrimary:active:not(:disabled) {
+  filter: brightness(0.94);
+}
+
+.wxLoginLinkBtn {
+  margin-top: 4px;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: #576b95;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.loginPage,
+.appPage {
+  position: relative;
+  isolation: isolate;
+  background: var(--bg-page);
+}
+
+.loginPage::before,
+.appPage::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 50% at 100% 0%, color-mix(in oklab, var(--accent) 8%, transparent), transparent 45%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .loginPage::before,
+  .appPage::before {
+    background: radial-gradient(ellipse 70% 45% at 80% -5%, color-mix(in oklab, var(--accent) 10%, transparent), transparent 42%);
+  }
+}
+
+/* ========== 登录 ========== */
+.loginPage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: min(5vh, 40px) 18px 48px;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.loginCard {
+  width: 100%;
+  max-width: 1000px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--bg-surface) 82%, transparent);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: var(--elev-1);
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  overflow: hidden;
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .loginCard {
+    background: var(--bg-surface);
+  }
+}
+
+@media (max-width: 880px) {
+  .loginCard {
+    grid-template-columns: 1fr;
+    border-radius: var(--radius-lg);
+  }
+
+  .loginAside {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.loginAside {
+  position: relative;
+  padding: 36px 32px 40px;
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loginAside::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 36px;
+  bottom: 36px;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  opacity: 0.85;
+}
+
+.loginBrandRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.brandMark {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+  background: var(--accent-muted);
+}
+
+.brandMark--sm {
+  width: 40px;
+  height: 40px;
+  font-size: 12px;
+  border-radius: 12px;
+}
+
+.loginEyebrow {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.92;
+  margin-bottom: 6px;
+}
+
+.loginTitle {
+  font-family: var(--font-sans);
+  font-size: clamp(1.35rem, 3.6vw, 1.65rem);
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: -0.03em;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.loginLead {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 36em;
+}
+
+.loginSteps {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.loginSteps li {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.loginSteps .stepIx {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding-top: 2px;
+}
+
+.loginFormCol {
+  padding: 34px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: color-mix(in oklab, var(--bg-surface-2) 55%, transparent);
+}
+
+.loginFormHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.loginFormHead h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-h);
+  letter-spacing: -0.02em;
+}
+
+.pillPair {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+.pillPair button {
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 9px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text-muted);
+  min-height: 42px;
+  transition: color 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.pillPair button:hover {
+  color: var(--text-h);
+}
+
+.pillPair button.active {
+  color: var(--text-h);
+  background: var(--accent-muted);
+  border-color: var(--accent-border);
+}
+
+/* ========== 已登录：顶栏与主栅格 ========== */
+.appPage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 28px;
+  box-sizing: border-box;
+  text-align: left;
+  max-width: 1180px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.topbarV2 {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0 14px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: color-mix(in oklab, var(--bg-page) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.topbarTitles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.topbarBrand {
+  font-weight: 600;
+  font-size: clamp(0.95rem, 1.8vw, 1.05rem);
+  color: var(--text-h);
+  letter-spacing: -0.02em;
+}
+
+.topbarTitleSub {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.topbarActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.statusPill.ok {
+  color: var(--success);
+  border-color: color-mix(in oklab, var(--success) 45%, var(--border));
+  background: var(--success-muted);
+}
+
+.gridV2 {
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.22fr);
+  gap: 18px;
+  align-items: start;
+}
+
+@media (max-width: 920px) {
+  .gridV2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.commandColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.leftStack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* 折叠式「大模型解析」：默认收起，减少主界面噪音 */
+.parseDetails {
+  border: 0;
+  margin: 0;
+}
+
+.parseDetails > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 650;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid transparent;
+}
+
+.parseDetails[open] > summary {
+  border-bottom-color: var(--border-subtle);
+}
+
+.parseDetails > summary::-webkit-details-marker {
+  display: none;
+}
+
+.parseDetails > summary::after {
+  content: '▸';
+  font-size: 0.75rem;
+  opacity: 0.55;
+  margin-left: 4px;
+}
+
+.parseDetails[open] > summary::after {
+  content: '▾';
+}
+
+.parseDetailsBody {
+  padding-top: 4px;
+}
+
+.parseQuickRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.parseQuickRow .field {
+  flex: 1 1 160px;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.parseQuickRow .field .label {
+  font-size: 0.78rem;
+}
+
+.parseNested {
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 10px;
+  background: color-mix(in oklab, var(--bg-page) 55%, transparent);
+}
+
+.parseNested > summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  list-style: none;
+}
+
+.parseNested > summary::-webkit-details-marker {
+  display: none;
+}
+
+.parseNested[open] > summary {
+  margin-bottom: 10px;
+}
+
+.parseCheckRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: color-mix(in oklab, var(--bg-page) 45%, transparent);
+}
+
+.parseCheckRow input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.parseCheckLabel {
+  margin: 0;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.parseStatusOk {
+  color: var(--success);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.parseStatusWarn {
+  opacity: 0.85;
+  font-size: 0.8rem;
+}
+
+/* ========== 面板 ========== */
+.panel {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  box-shadow: var(--elev-1);
+  overflow: hidden;
+}
+
+.panel.parseConfigPanel {
+  border-color: var(--border-subtle);
+  background: var(--bg-surface);
+  box-shadow: var(--elev-1);
+}
+
+.panelHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: color-mix(in oklab, var(--bg-surface-2) 28%, var(--bg-surface));
+}
+
+.panelHeadTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-h);
+}
+
+.panelBody {
+  padding: 14px 16px 18px;
+}
+
+.metaPill {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--bg-surface-2);
+}
+
+button.metaPill--click {
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+}
+
+button.metaPill--click:hover {
+  border-color: color-mix(in oklab, var(--accent) 42%, var(--border));
+  background: color-mix(in oklab, var(--accent-muted) 55%, var(--bg-surface-2));
+  transform: translateY(-1px);
+}
+
+button.statusPill {
+  font: inherit;
+  cursor: pointer;
+}
+
+button.statusPill:hover {
+  filter: brightness(1.06);
+}
+
+/* ========== 表单控件 ========== */
+.field {
+  display: block;
+  margin: 0;
+}
+
+.field + .field {
+  margin-top: 2px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: var(--text-h);
+  letter-spacing: 0.01em;
+}
+
+input,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 48px;
+  padding: 13px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-h);
+  outline: none;
+  font-size: 15px;
+  font-family: var(--font-sans);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.5;
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+input:hover,
+textarea:hover {
+  border-color: color-mix(in oklab, var(--accent) 22%, var(--border));
+}
+
+input:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+/* ========== 按钮 ========== */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.row.wrap {
+  flex-wrap: wrap;
+}
+
+.btn {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-surface-2);
+  padding: 11px 20px;
+  min-height: 46px;
+  cursor: pointer;
+  color: var(--text-h);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+  transition: border-color 0.18s ease, background 0.18s ease, transform 0.12s ease, color 0.18s ease;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: color-mix(in oklab, var(--accent) 30%, var(--border));
+  background: color-mix(in oklab, var(--bg-surface-2) 70%, var(--accent-muted));
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn.primary {
+  border-color: transparent;
+  background: linear-gradient(165deg, color-mix(in oklab, var(--accent-bright) 88%, white 0%), var(--accent));
+  color: var(--accent-on);
+  font-weight: 600;
+}
+
+.btn.primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.btn.danger {
+  background: var(--danger-muted);
+  border-color: color-mix(in oklab, var(--danger) 35%, var(--border));
+  color: var(--danger);
+}
+
+.btn.danger:hover:not(:disabled) {
+  border-color: color-mix(in oklab, var(--danger) 55%, var(--border));
+}
+
+.btn.ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-muted);
+}
+
+.btn.ghost:hover:not(:disabled) {
+  color: var(--text-h);
+  background: color-mix(in oklab, var(--bg-surface-2) 80%, transparent);
+}
+
+.btn:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.btn.chip {
+  min-height: 36px;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 999px;
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+.btn.chip:hover:not(:disabled) {
+  border-color: var(--accent-border);
+  color: var(--accent);
+  background: var(--accent-muted);
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ========== 设备列表 ========== */
+.bindRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.bindRow input {
+  flex: 1;
+  min-width: 160px;
+}
+
+.list {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.item:hover {
+  border-color: color-mix(in oklab, var(--accent) 25%, var(--border));
+}
+
+.item.active {
+  border-color: var(--accent-border);
+  background: var(--accent-muted);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 15%, transparent);
+}
+
+@media (max-width: 520px) {
+  .item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .item .btn.danger {
+    width: 100%;
+  }
+}
+
+.link {
+  border: 0;
+  background: transparent;
+  padding: 4px 2px;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  flex: 1;
+  color: inherit;
+  border-radius: 8px;
+  min-width: 0;
+  transition: background 0.15s ease;
+}
+
+.link:hover {
+  background: color-mix(in oklab, var(--accent) 6%, transparent);
+}
+
+.itemTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--text-h);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--bg-surface-2);
+}
+
+.badge.ok {
+  color: var(--success);
+  border-color: color-mix(in oklab, var(--success) 40%, var(--border));
+  background: var(--success-muted);
+}
+
+.targetLine {
+  font-size: 14px;
+  margin: 0 0 10px;
+  color: var(--text);
+}
+
+.targetLine b {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+/* ========== 提示与解析 ========== */
+.hintCard {
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: color-mix(in oklab, var(--bg-surface-2) 90%, var(--accent-muted));
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.hintCardTitle {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-h);
+  margin-bottom: 8px;
+}
+
+.hintCard ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.hintCard li {
+  margin: 5px 0;
+}
+
+.interpretBanner {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: color-mix(in oklab, var(--bg-surface-2) 70%, var(--bg-surface));
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-h);
+  font-family: var(--font-mono);
+}
+
+.llmStatsBanner {
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px dashed color-mix(in oklab, var(--accent) 38%, var(--border));
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  background: color-mix(in oklab, var(--bg-page) 48%, transparent);
+}
+
+/* ========== 执行结果 / 截图 / 事件 ========== */
+.shotWrap {
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--code-bg);
+  max-height: min(68vh, 860px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.shotWrap {
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.shot {
+  width: 100%;
+  height: auto;
+  max-height: min(68vh, 860px);
+  object-fit: contain;
+  display: block;
+}
+
+.events {
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  max-height: 240px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--bg-surface);
+}
+
+.evt {
+  display: grid;
+  grid-template-columns: minmax(76px, 100px) 1fr;
+  gap: 12px;
+  padding: 11px 14px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 12px;
+  text-align: left;
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 480px) {
+  .evt {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+}
+
+.evt:first-child {
+  border-top: 0;
+}
+
+.evt .ts {
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+}
+
+.evt .msg {
+  color: var(--text);
+  word-break: break-word;
+}
+
+.evt.error {
+  background: var(--danger-muted);
+}
+
+.emptyCanvas {
+  padding: 28px 20px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border);
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.55;
+  background: color-mix(in oklab, var(--bg-surface-2) 40%, transparent);
+}
+
+/* ========== 反馈条 ========== */
+.apiError {
+  width: 100%;
+  margin: 0 0 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in oklab, var(--danger) 45%, var(--border));
+  background: var(--danger-muted);
+  color: var(--text-h);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.apiErrorText {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.error {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in oklab, var(--danger) 40%, var(--border));
+  background: var(--danger-muted);
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.apiNotice {
+  margin-top: 4px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in oklab, var(--success) 40%, var(--border));
+  background: var(--success-muted);
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.small {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.commandMeta {
+  font-size: 12px;
+  word-break: break-all;
+  font-family: var(--font-mono);
+  opacity: 0.85;
+}
+
+.commandMeta code {
+  font-size: inherit;
+}
+
+/* ========== 可折叠帮助 ========== */
+.helpDetails {
+  margin: 0 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: color-mix(in oklab, var(--bg-surface-2) 65%, transparent);
+  overflow: hidden;
+}
+
+.helpDetails summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-h);
+  padding: 13px 16px;
+  list-style: none;
+  letter-spacing: 0.02em;
+  transition: background 0.15s ease;
+}
+
+.helpDetails summary:hover {
+  background: color-mix(in oklab, var(--accent) 5%, transparent);
+}
+
+.helpDetails summary::-webkit-details-marker {
+  display: none;
+}
+
+.helpBody {
+  padding: 0 16px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.helpDetails[open] summary {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* ========== 类微信全屏聊天壳 + 抽屉菜单 ========== */
+.wxAppShell,
+.appPage--chatShell {
+  --wx-header-h: 48px;
+  --wx-chat-bg: #ededed;
+  --wx-header-bg: #f7f7f7;
+  --wx-header-text: #111;
+  --wx-header-muted: rgba(0, 0, 0, 0.45);
+  --wx-user-bubble: #95ec69;
+  --wx-user-text: #111;
+  --wx-assist-bubble: #ffffff;
+  --wx-assist-text: #111;
+  --wx-meta: rgba(0, 0, 0, 0.42);
+  --wx-avatar-assist-bg: #10aeff;
+  --wx-avatar-user-bg: #576b95;
+  --wx-send: #07c160;
+  --wx-send-disabled: color-mix(in oklab, #07c160 38%, #888);
+  --wx-drawer-bg: var(--bg-surface);
+  --wx-drawer-text: var(--text);
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  padding: 0;
+  background: var(--wx-chat-bg);
+  color: var(--wx-drawer-text);
+}
+
+@media (prefers-color-scheme: dark) {
+  .wxAppShell,
+  .appPage--chatShell {
+    --wx-chat-bg: #111111;
+    --wx-header-bg: #2c2c2c;
+    --wx-header-text: #f2f2f2;
+    --wx-header-muted: rgba(255, 255, 255, 0.5);
+    --wx-user-bubble: #2bae67;
+    --wx-user-text: #fff;
+    --wx-assist-bubble: #2c2c2c;
+    --wx-assist-text: #ececec;
+    --wx-meta: rgba(255, 255, 255, 0.42);
+    --wx-avatar-assist-bg: #10aeff;
+    --wx-avatar-user-bg: #5b6e9e;
+    --wx-drawer-bg: #1a1a1c;
+  }
+}
+
+.wxAppShell::before,
+.appPage--chatShell::before {
+  opacity: 0.2;
+}
+
+.wxToast {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  background: color-mix(in oklab, var(--danger) 12%, var(--wx-drawer-bg));
+  border-bottom: 1px solid color-mix(in oklab, var(--danger) 22%, transparent);
+  color: var(--text-h);
+}
+
+.wxToast .btn {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.wxHeader {
+  flex-shrink: 0;
+  height: var(--wx-header-h);
+  padding: 0 8px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--wx-header-bg);
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 8%, transparent);
+  padding-top: env(safe-area-inset-top, 0);
+  min-height: calc(var(--wx-header-h) + env(safe-area-inset-top, 0));
+}
+
+/* 与右侧「···」同宽，保证标题在整条顶栏内视觉居中 */
+.wxHeaderSpacer {
+  width: 44px;
+  flex-shrink: 0;
+}
+
+.wxHeaderMain {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.wxHeaderTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--wx-header-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.wxOnlineDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: #bbb;
+}
+
+.wxOnlineDot.ok {
+  background: #07c160;
+}
+
+.wxHeaderMore {
+  flex-shrink: 0;
+  width: 44px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--wx-header-text);
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wxHeaderMore:hover {
+  background: color-mix(in oklab, var(--wx-header-text) 6%, transparent);
+}
+
+.wxHeaderBack {
+  width: 44px;
+  flex-shrink: 0;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--wx-header-text);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wxHeaderBack:hover {
+  background: color-mix(in oklab, var(--wx-header-text) 6%, transparent);
+}
+
+.wxTabBody {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.wxSessionListWrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--wx-chat-bg);
+}
+
+.wxSearchBar {
+  flex-shrink: 0;
+  padding: 8px 10px 6px;
+  background: var(--wx-header-bg);
+}
+
+.wxSearchFake {
+  height: 36px;
+  border-radius: 8px;
+  background: color-mix(in oklab, var(--wx-header-text) 6%, var(--wx-header-bg));
+  color: var(--wx-header-muted);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 12px;
+}
+
+.wxSessionList {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.wxSessionRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 6%, transparent);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wxSessionRow:hover {
+  background: color-mix(in oklab, var(--wx-header-text) 4%, transparent);
+}
+
+.wxSessionMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.wxSessionRowTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.wxSessionTitle {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wxSessionTime {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--wx-header-muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.wxSessionSub {
+  font-size: 12px;
+  color: var(--wx-meta);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wxSessionAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  color: #fff;
+}
+
+.wxAv--slate {
+  background: linear-gradient(135deg, #475569, #1e293b);
+}
+.wxAv--emerald {
+  background: linear-gradient(135deg, #059669, #064e3b);
+}
+.wxAv--violet {
+  background: linear-gradient(135deg, #7c3aed, #4c1d95);
+}
+.wxAv--amber {
+  background: linear-gradient(135deg, #d97706, #78350f);
+}
+.wxAv--deviceOn {
+  background: linear-gradient(135deg, #07c160, #0b6b3a);
+}
+.wxAv--deviceOff {
+  background: linear-gradient(135deg, #6b7280, #374151);
+}
+
+.wxTabBar {
+  flex-shrink: 0;
+  display: flex;
+  border-top: 1px solid color-mix(in oklab, var(--wx-header-text) 8%, transparent);
+  background: var(--wx-header-bg);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.wxTab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 6px 4px 8px;
+  cursor: pointer;
+  color: var(--wx-header-muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.wxTab--active {
+  color: #07c160;
+}
+
+.wxTabIcon {
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.wxTabLabel {
+  font-size: 11px;
+}
+
+.wxTabPane {
+  flex: 1;
+  min-height: 0;
+}
+
+.wxTabPane--pad {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.wxTabPane--scroll {
+  padding: 0 0 16px;
+  overflow-y: auto;
+}
+
+.wxDiscoverHint {
+  padding: 24px 16px;
+  color: var(--wx-meta);
+  text-align: center;
+}
+
+.wxMeSection {
+  padding: 16px 14px;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 6%, transparent);
+}
+
+.wxMeSection h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.wxMePane {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.wxMePane--sub {
+  background: var(--wx-header-bg);
+}
+
+.wxMeHero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 8%, transparent);
+}
+
+.wxMeAvatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #07c160, #0b6b3a);
+  color: #fff;
+  font-size: 28px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.wxMeAvatar--lg {
+  width: 80px;
+  height: 80px;
+  font-size: 32px;
+  margin-bottom: 0;
+}
+
+.wxMeNameBtn {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 10px;
+  max-width: 100%;
+  text-align: center;
+  word-break: break-all;
+}
+
+.wxMeNameBtn:hover {
+  background: color-mix(in oklab, var(--wx-header-text) 6%, transparent);
+}
+
+.wxMeNameHint {
+  margin: 6px 0 0;
+  text-align: center;
+}
+
+.wxMeNotice {
+  margin: 0 14px 8px;
+}
+
+.wxMeMenu {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0 8px;
+}
+
+.wxMeMenuRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 6%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wxMeMenuRow:hover {
+  background: color-mix(in oklab, var(--wx-header-text) 4%, transparent);
+}
+
+.wxMeLogoutSection {
+  margin-top: auto;
+  border-bottom: none;
+  padding-top: 24px;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
+}
+
+.wxMeInnerHeader {
+  flex-shrink: 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 8%, transparent);
+}
+
+.wxMeSubScroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: env(safe-area-inset-bottom, 12px);
+}
+
+.wxMeSubTitle {
+  margin: 20px 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.wxMeProfileCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0 16px;
+}
+
+.wxMeProfileEmail {
+  font-size: 14px;
+  color: var(--wx-meta);
+  text-align: center;
+  word-break: break-all;
+}
+
+.wxDangerModal .wxModalBody {
+  padding-top: 8px;
+}
+
+.wxDangerText {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.wxAgentPrefCard {
+  border: 1px solid color-mix(in oklab, var(--wx-header-text) 10%, transparent);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: color-mix(in oklab, var(--wx-header-text) 3%, transparent);
+}
+
+.wxAgentPrefHead {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.wxAgentPrefField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.wxAgentPrefField span:first-child {
+  color: var(--wx-meta);
+}
+
+.wxAgentPrefField select,
+.wxAgentPrefField textarea {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid color-mix(in oklab, var(--wx-header-text) 12%, transparent);
+  padding: 8px 10px;
+  font: inherit;
+  background: var(--wx-drawer-bg);
+  color: inherit;
+}
+
+.wxContactDeviceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 6%, transparent);
+}
+
+/* ========== 通讯录：添加朋友、拼音分组、详情页 ========== */
+.wxContactsMainPane {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+}
+
+.wxAddFriendRow {
+  flex-shrink: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 8%, transparent);
+  background: color-mix(in oklab, var(--wx-header-text) 4%, var(--wx-header-bg));
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wxAddFriendRow:hover {
+  background: color-mix(in oklab, var(--wx-header-text) 7%, var(--wx-header-bg));
+}
+
+.wxAddFriendIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: var(--wx-send);
+  color: #fff;
+  font-size: 22px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wxAddFriendLabel {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.wxAddDeviceIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wxContactsBlock {
+  flex-shrink: 0;
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 6%, transparent);
+}
+
+.wxContactsBlock--agents {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.wxContactsBlockTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--wx-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.wxBindRowTight {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.wxBindRowTight input {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+.wxHelpTight {
+  margin-top: 8px;
+}
+
+.wxContactsDeviceList {
+  margin-top: 10px;
+}
+
+.wxContactsEmptyNote {
+  padding: 8px 0 4px;
+}
+
+.wxContactsTapRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 5%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wxContactsTapRow:hover {
+  background: color-mix(in oklab, var(--wx-header-text) 3%, transparent);
+}
+
+.wxChev {
+  margin-left: auto;
+  color: var(--wx-meta);
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.wxContactsWithRail {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 4px;
+  padding-right: 4px;
+}
+
+.wxContactsListScroll {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+}
+
+.wxAlphaGroup {
+  scroll-margin-top: 8px;
+}
+
+.wxAlphaLetter {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 6px 14px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--wx-meta);
+  background: color-mix(in oklab, var(--wx-header-bg) 92%, transparent);
+  backdrop-filter: blur(6px);
+}
+
+.wxAlphaRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 5%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wxAlphaRow:hover {
+  background: color-mix(in oklab, var(--wx-header-text) 4%, transparent);
+}
+
+.wxAlphaRowText {
+  flex: 1;
+  min-width: 0;
+}
+
+.wxAlphaName {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.wxAlphaSub {
+  margin-top: 2px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.wxPinyinRail {
+  flex-shrink: 0;
+  width: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2px;
+  padding: 4px 0 12px;
+}
+
+.wxPinyinRailBtn {
+  border: none;
+  background: transparent;
+  color: var(--wx-send);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 2px 0;
+  cursor: pointer;
+  width: 100%;
+}
+
+.wxPinyinRailBtn:hover {
+  opacity: 0.85;
+}
+
+.wxContactDetail {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--wx-header-bg);
+}
+
+.wxContactDetailBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(20px + env(safe-area-inset-bottom, 0));
+}
+
+.wxDetailHero {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 18px 20px;
+}
+
+.wxDetailAvatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 28px;
+  color: #fff;
+}
+
+.wxDetailNames {
+  flex: 1;
+  min-width: 0;
+}
+
+.wxDetailTitle {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.wxDetailSub {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--wx-meta);
+  line-height: 1.4;
+}
+
+.wxDetailRows {
+  border-top: 1px solid color-mix(in oklab, var(--wx-header-text) 8%, transparent);
+}
+
+.wxDetailRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 18px;
+  border-bottom: 1px solid color-mix(in oklab, var(--wx-header-text) 6%, transparent);
+}
+
+.wxDetailRowK {
+  font-size: 13px;
+  color: var(--wx-meta);
+}
+
+.wxDetailRowV {
+  font-size: 15px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.wxDetailActions {
+  padding: 28px 18px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.wxDetailPrimaryBtn {
+  border: none;
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--wx-send);
+  color: #fff;
+}
+
+.wxDetailPrimaryBtn:hover {
+  filter: brightness(1.05);
+}
+
+.wxDetailGhostBtn {
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 15px;
+  cursor: pointer;
+  border: 1px solid color-mix(in oklab, var(--wx-header-text) 14%, transparent);
+  background: transparent;
+  color: inherit;
+}
+
+.wxDrawerDeviceCard {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in oklab, var(--wx-header-text) 10%, transparent);
+  background: color-mix(in oklab, var(--wx-header-text) 4%, transparent);
+}
+
+.wxDrawerDeviceTitle {
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.wxDrawerRemoveBtn {
+  margin-top: 16px;
+  width: 100%;
+}
+
+.wxModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: color-mix(in oklab, #000 48%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  animation: wxFadeIn 0.2s ease-out;
+}
+
+.wxModalSheet {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 12px;
+  background: var(--wx-drawer-bg);
+  color: var(--text);
+  box-shadow: 0 16px 48px color-mix(in oklab, #000 35%, transparent);
+  overflow: hidden;
+}
+
+.wxModalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.wxModalClose {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+
+.wxModalClose:hover {
+  background: color-mix(in oklab, var(--wx-header-text) 8%, transparent);
+}
+
+.wxModalBody {
+  padding: 14px 16px 18px;
+}
+
+.wxModalErr {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.wxModalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.wxModalField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 13px;
+}
+
+.wxModalField > span {
+  color: var(--wx-meta);
+  font-weight: 500;
+}
+
+.wxExecFold {
+  margin: 10px 8px 0;
+  border-radius: 10px;
+  border: 1px solid color-mix(in oklab, var(--wx-header-text) 8%, transparent);
+  background: color-mix(in oklab, var(--wx-header-text) 3%, var(--wx-chat-bg));
+}
+
+.wxExecFold summary {
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.wxExecFoldBody {
+  padding: 0 12px 12px;
+}
+
+.wxChatMain.wxChatWall--slate {
+  --wx-chat-bg: linear-gradient(180deg, #1e293b 0%, #0f172a 40%, #0b1220 100%);
+  background: var(--wx-chat-bg);
+}
+.wxChatMain.wxChatWall--emerald {
+  --wx-chat-bg: linear-gradient(180deg, #064e3b 0%, #022c22 45%, #011a14 100%);
+  background: var(--wx-chat-bg);
+}
+.wxChatMain.wxChatWall--violet {
+  --wx-chat-bg: linear-gradient(180deg, #4c1d95 0%, #2e1065 45%, #1a0a3a 100%);
+  background: var(--wx-chat-bg);
+}
+.wxChatMain.wxChatWall--amber {
+  --wx-chat-bg: linear-gradient(180deg, #78350f 0%, #451a03 45%, #1c0a01 100%);
+  background: var(--wx-chat-bg);
+}
+
+.wxAvatar--agent {
+  background: linear-gradient(135deg, #a855f7, #6366f1);
+}
+
+.wxBubble--agent {
+  background: color-mix(in oklab, #fff 12%, transparent);
+  border: 1px solid color-mix(in oklab, #fff 18%, transparent);
+}
+
+.wxChatMain {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.wxChatScroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 10px 16px;
+  scroll-behavior: smooth;
+}
+
+.wxChatFeed {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.wxChatEmpty {
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--wx-meta);
+}
+
+.wxChatErr {
+  margin: 0 8px 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  background: color-mix(in oklab, var(--danger) 10%, var(--wx-chat-bg));
+  color: var(--text-h);
+}
+
+.wxMsg {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.wxMsg--assistant {
+  justify-content: flex-start;
+}
+
+.wxMsg--user {
+  justify-content: flex-end;
+}
+
+.wxAvatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.wxAvatar--assistant {
+  background: var(--wx-avatar-assist-bg);
+}
+
+.wxAvatar--user {
+  background: var(--wx-avatar-user-bg);
+}
+
+.wxMsgCol {
+  max-width: calc(100% - 52px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wxBubble {
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  box-shadow: 0 1px 1px color-mix(in oklab, #000 6%, transparent);
+}
+
+.wxBubble--assistant {
+  background: var(--wx-assist-bubble);
+  color: var(--wx-assist-text);
+  border-bottom-left-radius: 2px;
+}
+
+.wxBubble--user {
+  background: var(--wx-user-bubble);
+  color: var(--wx-user-text);
+  border-bottom-right-radius: 2px;
+}
+
+.wxBubbleShotBtn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: zoom-in;
+  background: transparent;
+  line-height: 0;
+}
+
+.wxBubbleShot {
+  display: block;
+  width: 100%;
+  max-width: min(280px, 72vw);
+  height: auto;
+  vertical-align: middle;
+}
+
+.wxBubbleShotCaption {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--wx-assist-text);
+}
+
+.wxMeta {
+  font-size: 11px;
+  color: var(--wx-meta);
+  padding: 0 2px;
+}
+
+.wxMeta--user {
+  text-align: right;
+}
+
+.wxInputBar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom, 0));
+  background: var(--wx-header-bg);
+  border-top: 1px solid color-mix(in oklab, var(--wx-header-text) 8%, transparent);
+}
+
+.wxInput {
+  flex: 1;
+  min-width: 0;
+  min-height: 40px;
+  max-height: 120px;
+  resize: none;
+  border-radius: 8px;
+  border: 1px solid color-mix(in oklab, var(--wx-header-text) 12%, transparent);
+  background: color-mix(in oklab, var(--wx-chat-bg) 40%, var(--wx-header-bg));
+  color: var(--wx-header-text);
+  font-size: 16px;
+  line-height: 1.45;
+  padding: 9px 12px;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.wxInput:focus {
+  outline: 2px solid color-mix(in oklab, var(--wx-send) 55%, transparent);
+  outline-offset: 0;
+}
+
+.wxSend {
+  flex-shrink: 0;
+  min-width: 56px;
+  height: 40px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 6px;
+  background: var(--wx-send);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wxSend:disabled {
+  background: var(--wx-send-disabled);
+  cursor: not-allowed;
+}
+
+.wxDrawerBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  background: color-mix(in oklab, #000 45%, transparent);
+  animation: wxFadeIn 0.2s ease-out;
+}
+
+.wxDrawerSheet {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 270;
+  width: min(100%, 420px);
+  max-width: 100vw;
+  background: var(--wx-drawer-bg);
+  color: var(--text);
+  box-shadow: -8px 0 32px color-mix(in oklab, #000 28%, transparent);
+  display: flex;
+  flex-direction: column;
+  animation: wxSlideIn 0.22s ease-out;
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+@keyframes wxFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes wxSlideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.wxDrawerHead {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.wxDrawerHead h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.wxDrawerBody {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px 14px 24px;
+}
+
+.wxDrawerSection {
+  margin-bottom: 20px;
+}
+
+.wxDrawerSection h3 {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.wxDrawerSection .panelBody,
+.wxDrawerSection .parseDetailsBody {
+  padding: 0;
+}
+
+.wxChipRowMenu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.wxMenuHint {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 8px;
+}
+
+/* ========== Composer（参考 Cursor：主输入区收敛、次要说明折叠）========== */
+.composerStack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.composerTextarea {
+  min-height: 120px;
+  resize: vertical;
+  font-size: 14px;
+  line-height: 1.55;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--bg-surface-2) 40%, var(--bg-surface));
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.composerTextarea:hover {
+  border-color: color-mix(in oklab, var(--accent) 22%, var(--border));
+}
+
+.composerTextarea:focus {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+
+.composerMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.composerMeta kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-2);
+  color: var(--text-h);
+}
+
+.composerHelpFold {
+  margin: 0 0 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: color-mix(in oklab, var(--bg-surface-2) 55%, transparent);
+  overflow: hidden;
+}
+
+.composerHelpFold > summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 10px 14px;
+  letter-spacing: 0.03em;
+}
+
+.composerHelpFold > summary::-webkit-details-marker {
+  display: none;
+}
+
+.composerHelpFold[open] > summary {
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-h);
+}
+
+.composerHelpBody {
+  padding: 10px 14px 12px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+.composerHelpBody ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.composerHelpBody li {
+  margin: 4px 0;
+}
+
+/* ========== 截图灯箱 ========== */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: color-mix(in oklab, #000000 72%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: zoom-out;
+  animation: lightboxIn 0.18s ease-out;
+}
+
+@keyframes lightboxIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lightboxInner {
+  position: relative;
+  max-width: min(96vw, 1600px);
+  max-height: min(92vh, 1200px);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  cursor: default;
+}
+
+.lightboxInner img {
+  display: block;
+  max-width: min(96vw, 1600px);
+  max-height: min(92vh, 1200px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.lightboxClose {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, white 18%, transparent);
+  background: color-mix(in oklab, #0a0a0a 55%, transparent);
+  color: #f4f4f5;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+
+.lightboxClose:hover {
+  background: color-mix(in oklab, #0a0a0a 75%, transparent);
+  transform: scale(1.05);
+}
+
+.shotWrap--clickable {
+  cursor: zoom-in;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.shotWrap--clickable:hover {
+  border-color: color-mix(in oklab, var(--accent) 35%, var(--border));
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 25%, transparent);
+}
+
+.shotWrap--clickable:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ========== GLM 解析失败：查看原始返回 ========== */
+.wxLlmRawErrRow {
+  display: flex;
+  align-items: center;
+  margin: 6px 0 2px;
+}
+
+.wxLlmRawErrBtn {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  background: #e11d48;
+  color: #fff;
+  font-weight: 900;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px color-mix(in oklab, #e11d48 45%, transparent);
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.wxLlmRawErrBtn:hover {
+  filter: brightness(1.08);
+  transform: scale(1.06);
+}
+
+.wxLlmRawErrBtn:focus-visible {
+  outline: 2px solid color-mix(in oklab, #e11d48 70%, white);
+  outline-offset: 2px;
+}
+
+.rawTextModal {
+  position: fixed;
+  inset: 0;
+  z-index: 420;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  box-sizing: border-box;
+  background: color-mix(in oklab, #000000 70%, transparent);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.rawTextModalInner {
+  width: min(96vw, 720px);
+  max-height: min(86vh, 900px);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface-1);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.rawTextModalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.rawTextModalClose {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface-2);
+  color: var(--text-h);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rawTextModalClose:hover {
+  background: color-mix(in oklab, var(--bg-surface-2) 88%, var(--accent));
+}
+
+.rawTextModalBody {
+  margin: 0;
+  padding: 14px 16px 16px;
+  overflow: auto;
+  flex: 1;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
