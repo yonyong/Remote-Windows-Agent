@@ -2,7 +2,7 @@
 
 # Sirius (Remote Windows Agent)
 
-**Sirius** is an end-to-end **remote desktop automation** prototype. The subtitle **Remote Windows Agent** reflects the Windows-side agent that executes commands from the control plane.
+**Sirius** is a compact, end-to-end demo of **remote Windows automation** built around a **conversational web client** and a **Fastify + SQLite control plane** that pairs users with machines and keeps chat history in one place. **Natural language** becomes validated **CommandSpec** JSON through **rule**, **hybrid**, or **LLM-backed** parsing, and a **Node.js WebSocket agent** on Windows runs those commands locally while streaming logs and screenshots back to the UI. The subtitle **Remote Windows Agent** names that on-machine executor—the process that actually drives the desktop, not the cloud model by itself.
 
 **Suggested GitHub repository name:** [`sirius`](https://github.com/new) or [`sirius-remote-windows-agent`](https://github.com/new) if you want the full name in the URL.
 

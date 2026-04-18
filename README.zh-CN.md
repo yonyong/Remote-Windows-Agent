@@ -2,7 +2,7 @@
 
 # Sirius（Remote Windows Agent）
 
-**Sirius** 是一套可跑通的 **远程 Windows 自动化** 原型；副标题 **Remote Windows Agent** 表示在 Windows 侧运行的、接收控制面指令并执行桌面操作的 Agent。
+**Sirius** 是一套精简、可跑通的 **远程 Windows 自动化** 演示：围绕 **会话式 Web 前端** 与 **Fastify + SQLite 控制面**，把用户与设备配对、会话与审计放在同一条链路里。你在界面里用 **自然语言** 描述意图，控制面通过 **规则 / 混合 / 大模型** 解析为可校验的 **CommandSpec（JSON）**，由 **Node.js WebSocket Agent** 在 Windows 本机执行，并把日志与截图回传到前端。副标题 **Remote Windows Agent** 指的就是这台「在电脑上动手」的执行端，而不是单独指云端大模型。
 
 **建议的 GitHub 仓库名：** [`sirius`](https://github.com/new)，若希望 URL 与全称一致可选用 [`sirius-remote-windows-agent`](https://github.com/new)。
 
