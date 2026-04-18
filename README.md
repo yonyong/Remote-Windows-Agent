@@ -16,6 +16,17 @@
 
 > **Scope:** MVP / demo quality. Do **not** expose to the public internet without hardening (TLS, rate limits, strong secrets, operational monitoring).
 
+## The role of AI
+
+AI is not a decorative add-on here: it is the bridge between **how humans describe intent** and **what the Windows agent can safely execute**.
+
+- **Natural language → structured commands.** You type goals in plain language (e.g. “open Notepad and type hello”). The control plane turns that into a typed **command spec** (JSON) that the agent understands, using either **rules**, **rules + LLM (hybrid)**, or **LLM-first** parsing—configurable per user under **Me → Parse settings**.
+- **Provider flexibility.** The same flow supports Zhipu GLM, OpenAI-compatible APIs (including common proxies), and Gemini, with per-user keys stored in SQLite and optional **environment-variable defaults** for labs or single-tenant setups.
+- **Graceful degradation.** If no API key is set, the model errors, or you choose **rule** mode, the system still works: parsing falls back to deterministic rules so automation remains usable without cloud AI.
+- **Chat-shaped UX.** The web client feels like a messenger on purpose: conversation history and “agent friends” sit alongside device control, so **LLM-assisted parsing** and casual chat can share one mental model—commands and chat both flow through the control plane, with clear separation between **automation payloads** and **conversation**.
+
+Treat API keys and parse settings like secrets; they grant the ability to send interpreted commands to paired machines.
+
 ## Architecture
 
 ```mermaid
@@ -24,14 +35,39 @@ flowchart LR
     FE[React frontend]
   end
   subgraph server [Control plane]
-    CP[Fastify API + SQLite]
+    CP[Fastify + SQLite + NL command parse]
+  end
+  subgraph cloud [LLM providers]
+    LLM[Zhipu GLM / OpenAI-compatible / Gemini]
   end
   subgraph pc [Windows host]
     AG[Agent WebSocket client]
   end
   FE <-->|HTTPS JSON| CP
-  CP <-->|WebSocket| AG
+  CP <-->|NL to CommandSpec, HTTPS when LLM or hybrid| LLM
+  CP <-->|WebSocket, structured CommandSpec| AG
 ```
+
+## End-to-end flow (natural language → desktop action)
+
+```mermaid
+flowchart TD
+  U[User describes intent in natural language] --> FE[Frontend sends message or command request over HTTPS]
+  FE --> CP[Control plane: JWT, device scope, chat / audit persistence]
+  CP --> P{Command parse path}
+  P -->|rule| R[Rule engine builds CommandSpec]
+  P -->|hybrid or llm| M[LLM provider: natural language → structured command]
+  M --> V{Parse OK?}
+  V -->|no or timeout| R
+  V -->|yes| CS[Validated CommandSpec JSON]
+  R --> CS
+  CS --> WS[WebSocket: dispatch CommandSpec to paired Windows agent]
+  WS --> AG[Agent executes UI / shell automation locally]
+  AG --> BK[Agent reports logs and screenshots to control plane]
+  BK --> UI[Frontend refreshes thread, device status, or media previews]
+```
+
+**Hybrid** mode may try rules before calling the model; on model failure the control plane falls back to **rule** parsing, same as **llm** mode when no key is configured.
 
 ## Repository layout
 
@@ -109,7 +145,7 @@ If no usable key is configured or the model fails, parsing falls back to the **r
 
 ## License
 
-No license file is bundled yet. Add a `LICENSE` (e.g. MIT) before publishing if you want a standard open-source grant.
+This project is licensed under the **Apache License 2.0**. See [LICENSE](LICENSE).
 
 ## Quick links
 

@@ -16,6 +16,17 @@
 
 > **定位：** MVP / 演示用途。若部署到公网，请务必加固（HTTPS、限流、强密钥、监控与备份等）。
 
+## AI 在本项目中的作用
+
+这里的 AI 不是“挂个模型”的噱头，而是把 **人用自然语言表达的意图** 转成 **Windows Agent 能执行、且可被协议约束的结构化指令** 的核心环节。
+
+- **自然语言 → 结构化指令。** 你在前端用口语描述目标（例如「打开记事本并输入 hello」），控制面将其解析为 Agent 认识的 **CommandSpec（JSON）**；解析路径支持 **纯规则**、**规则 + 大模型（混合）**、**以大模型为主**，可在 **「我」→ 解析 / 模型设置** 中按用户配置。
+- **多厂商接入。** 同一套流程可对接智谱 GLM、OpenAI 兼容接口（含常见代理）、Gemini；密钥与模型参数写入 SQLite，也可用 **环境变量** 作为实验室或单租户场景的全局默认。
+- **可降级。** 未配置密钥、模型调用失败或显式选择 **规则** 模式时，会 **回退到规则解析**，保证不依赖云端大模型也能完成基础自动化演示。
+- **与「聊天式」产品形态一致。** 前端刻意做成类微信体验：会话、通讯录与设备控制并列，便于把 **大模型辅助解析** 与 **闲聊 / Agent 人设** 放在同一套交互心智里；自动化载荷与纯聊天在控制面侧仍应区分处理。
+
+API Key 与解析配置等同于敏感凭据，会直接影响已配对机器上可被解释执行的指令，请仅在可信环境中使用。
+
 ## 架构
 
 ```mermaid
@@ -24,14 +35,39 @@ flowchart LR
     FE[React 前端]
   end
   subgraph server [控制面]
-    CP[Fastify API + SQLite]
+    CP[Fastify + SQLite + 自然语言指令解析]
+  end
+  subgraph cloud [大模型服务]
+    LLM[智谱 GLM / OpenAI 兼容 / Gemini 等]
   end
   subgraph pc [Windows 主机]
     AG[Agent WebSocket 客户端]
   end
   FE <-->|HTTPS JSON| CP
-  CP <-->|WebSocket| AG
+  CP <-->|自然语言→CommandSpec（LLM/混合模式时走 HTTPS）| LLM
+  CP <-->|WebSocket，下发结构化 CommandSpec| AG
 ```
+
+## 端到端流程（自然语言 → 桌面执行）
+
+```mermaid
+flowchart TD
+  U[用户用自然语言描述意图] --> FE[前端通过 HTTPS 发送消息或指令请求]
+  FE --> CP[控制面：鉴权、设备范围、聊天与审计落库]
+  CP --> P{指令解析路径}
+  P -->|rule| R[规则引擎生成 CommandSpec]
+  P -->|hybrid / llm| M[大模型服务：自然语言 → 结构化指令]
+  M --> V{解析是否成功}
+  V -->|失败或超时| R
+  V -->|成功| CS[校验通过的 CommandSpec JSON]
+  R --> CS
+  CS --> WS[WebSocket：向已配对 Windows Agent 下发 CommandSpec]
+  WS --> AG[Agent 在本地执行 UI / 命令行等自动化]
+  AG --> BK[Agent 回传日志与截图至控制面]
+  BK --> UI[前端更新会话、设备状态或媒体预览]
+```
+
+**混合（hybrid）** 模式通常会先尝试规则再视情况调用大模型；**大模型（llm）** 在无密钥或调用失败时也会与 **规则** 一样走回退路径。
 
 ## 目录结构
 
@@ -94,7 +130,7 @@ npm run dev
 
 ## 许可证
 
-仓库根目录暂未包含 `LICENSE` 文件。若希望以标准开源协议发布，请自行添加（例如 MIT）。
+本项目采用 **Apache License 2.0**，详见仓库根目录 [LICENSE](LICENSE)。
 
 ## 相关链接
 
